@@ -90,6 +90,13 @@ const showLineChart = (divlinechart, series, height = 350) => {
       //offsetY: -25,
       //offsetX: -5
     },
+    tooltip: {
+      x: {
+        formatter: val => {
+          return new DateTime(val).toString();
+        },
+      },
+    },
     /*
     tooltip: {
       y: {
