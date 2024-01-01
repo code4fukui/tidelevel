@@ -1,0 +1,142 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>気象庁 潮位データ 2024-01-01 （北陸4県）</title>
+</head><body>
+<h1>気象庁 潮位データ 2024-01-01 （北陸4県）</h1>
+<div id=divlinechart></div>
+<hr>
+<a href=https://www.jma.go.jp/bosai/tidelevel/>気象庁｜潮位観測情報</a><br>
+
+<script type="module">
+import ApexCharts from "https://code4fukui.github.io/apexcharts.js/ApexCharts.js";
+import { Station } from "./Station.js";
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { DateTime } from "https://js.sabae.cc/DateTime.js";
+
+const showLineChart = (divlinechart, series, height = 350) => {
+  const options = {
+    series,
+    chart: {
+      height,
+      type: "line",
+      toolbar: {
+        show: true
+      },
+      animations: {
+        enabled: false,
+      },
+    },
+    //colors: ['#77B6EA', '#545454'],
+    /*
+    dataLabels: {
+      enabled: true,
+    },
+    */
+    stroke: {
+      width: 2,
+      curve: "straight",
+    },
+    /*
+    title: {
+      text: title || "",
+      align: "center",
+    },
+    */
+    /*
+    grid: {
+      borderColor: '#e7e7e7',
+      row: {
+        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+        opacity: 0.5
+      },
+    },
+    */
+    /*
+    markers: {
+      size: 1
+    },
+    */
+    /*
+    xaxis: {
+      categories: months.map(i => Math.floor(i / 100) + "/" + i % 100),
+      title: {
+        text: 'Month'
+      }
+    },
+    */
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        datetimeUTC: false,
+      }
+    },
+    /*
+    yaxis: {
+      title: {
+        text: 'Temperature'
+      },
+      min: 5,
+      max: 40
+    },
+    */
+    legend: {
+      position: "top",
+      horizontalAlign: "center",
+      //floating: true,
+      //offsetY: -25,
+      //offsetX: -5
+    },
+    /*
+    tooltip: {
+      y: {
+        formatter: (v) => {
+          return Num.addComma(v) + "人";
+        },
+      }
+    },
+    */
+  };
+
+  const chart = new ApexCharts(divlinechart, options);
+  chart.render();
+};
+
+const stations = await CSV.fetchJSON("data/stations.csv");
+
+const series = [];
+for (const s of stations) {
+  const st = new Station(s.station_code, "20240101")
+  //const url = "data/202312/145553/tide_obs_20231226_145553.json";
+  const url = st.getURL();
+  const tide = await (await fetch(url)).json();
+  const data = [];
+  let t = new DateTime(tide.time).getTime();
+  console.log(t, performance.now(), new Date().getTime())
+  const dt = parseInt(tide.interval) * 1000;
+  const d = tide.tide;
+  for (let i = 0; i < d.length; i++) {
+    data.push([t, d[i]]);
+    t += dt;
+  }
+  series.push({ name: s.pref + " " + s.name, data });
+}
+
+showLineChart(divlinechart, series, 700);
+</script>
+
+<style>
+body {
+  background-color: #222255;
+  font-family: sans-serif;
+  color: white;
+}
+h1 {
+  color: white;
+}
+#divlinechart {
+  background-color: #f8f8f8;
+  color: #222;
+}
+a {
+  color: white !important;
+}
+</style>
