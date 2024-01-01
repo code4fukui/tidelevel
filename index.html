@@ -114,8 +114,11 @@ for (const day of days) {
   for (const s of stations) {
     const st = new Station(s.station_code, day);
     const url = st.getURL();
-    const tide = await (await fetch(url)).json();
-    tides[url] = tide;
+    try {
+      const tide = await (await fetch(url)).json();
+      tides[url] = tide;
+    } catch (e) {
+    }
   }
 }
 
@@ -128,6 +131,7 @@ const show = (div, pref = null) => {
       const st = new Station(s.station_code, day);
       const url = st.getURL();
       const tide = tides[url];
+      if (!tide) continue;
       let t = new DateTime(tide.time).getTime();
       //console.log(t, performance.now(), new Date().getTime())
       const dt = parseInt(tide.interval) * 1000;
