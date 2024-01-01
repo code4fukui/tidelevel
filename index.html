@@ -105,30 +105,37 @@ const showLineChart = (divlinechart, series, height = 350) => {
   chart.render();
 };
 
+const twodays = new DateTime().getTime() > new DateTime("2024-01-02T00:00:00+09:00").getTime();
+const days = twodays ? ["20240101", "20240102"] : ["20240101"];
+
 const stations = await CSV.fetchJSON("data/stations.csv");
 const tides = {};
-for (const s of stations) {
-  const st = new Station(s.station_code, "20240101")
-  const url = st.getURL();
-  const tide = await (await fetch(url)).json();
-  tides[url] = tide;
+for (const day of days) {
+  for (const s of stations) {
+    const st = new Station(s.station_code, day);
+    const url = st.getURL();
+    const tide = await (await fetch(url)).json();
+    tides[url] = tide;
+  }
 }
 
 const show = (div, pref = null) => {
   const series = [];
   for (const s of stations) {
     if (pref && s.pref != pref) continue;
-    const st = new Station(s.station_code, "20240101")
-    const url = st.getURL();
-    const tide = tides[url];
     const data = [];
-    let t = new DateTime(tide.time).getTime();
-    //console.log(t, performance.now(), new Date().getTime())
-    const dt = parseInt(tide.interval) * 1000;
-    const d = tide.tide;
-    for (let i = 0; i < d.length; i++) {
-      data.push([t, d[i]]);
-      t += dt;
+    for (const day of days) {
+      const st = new Station(s.station_code, day);
+      const url = st.getURL();
+      const tide = tides[url];
+      let t = new DateTime(tide.time).getTime();
+      //console.log(t, performance.now(), new Date().getTime())
+      const dt = parseInt(tide.interval) * 1000;
+      const d = tide.tide;
+      for (let i = 0; i < d.length; i++) {
+        data.push([t, d[i]]);
+        t += dt;
+      }
     }
     series.push({ name: s.pref + " " + s.name, data });
   }
