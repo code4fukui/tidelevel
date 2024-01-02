@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
-<title>気象庁 潮位データ 2024-01-01/02 （北陸4県）</title>
+<title>気象庁 潮位データ 2024-01-01/02 （日本海側5府県）</title>
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image"  content="https://code4fukui.github.io/tidelevel/ss.jpg">
 <meta name="twitter:image" content="https://code4fukui.github.io/tidelevel/ss.jpg">
 </head><body>
-<h1>気象庁 潮位データ 2024-01-01/02 （北陸4県）</h1>
+<h1>気象庁 潮位データ 2024-01-01/02 （日本海側5府県）</h1>
 <div class=chart id=divlinechart></div>
 <div id=divlinecharts></div>
 <hr>
@@ -155,7 +155,7 @@ const show = (div, pref = null) => {
 };
 show(divlinechart);
 
-const prefs = ["石川県", "富山県", "新潟県", "福井県"];
+const prefs = ["石川県", "富山県", "新潟県", "福井県", "京都府"];
 for (const pref of prefs) {
   const div = document.createElement("div");
   div.className = "chart";
