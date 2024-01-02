@@ -25,5 +25,5 @@ if (dt < 0) {
 }
 */
 //await saveDay(new Day("2024/01/01"));
-//await saveDay(new Day("2024/01/02"));
+await saveDay(new Day("2024/01/02"));
 await saveDay(new Day("2024/01/03"));
