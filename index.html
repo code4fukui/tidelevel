@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
-<title>気象庁 潮位データ 2024-01-01/02 （日本海側5府県）</title>
+<title>気象庁 潮位データ 2024-01-01/03 （日本海側5府県）</title>
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image"  content="https://code4fukui.github.io/tidelevel/ss.jpg">
 <meta name="twitter:image" content="https://code4fukui.github.io/tidelevel/ss.jpg">
 </head><body>
-<h1>気象庁 潮位データ 2024-01-01/02 （日本海側5府県）</h1>
+<h1>気象庁 潮位データ 2024-01-01/03 （日本海側5府県）</h1>
 <div class=chart id=divlinechart></div>
 <div id=divlinecharts></div>
 <hr>
@@ -134,8 +134,9 @@ const showLineChart = (divlinechart, series, height = 350) => {
   chart.render();
 };
 
-const twodays = new DateTime().getTime() > new DateTime("2024-01-02T00:00:00+09:00").getTime();
-const days = twodays ? ["20240101", "20240102"] : ["20240101"];
+//const twodays = new DateTime().getTime() > new DateTime("2024-01-02T00:00:00+09:00").getTime();
+//const days = twodays ? ["20240101", "20240102"] : ["20240101"];
+const days = ["20240101", "20240102", "20240103"];
 
 const stations = await CSV.fetchJSON("data/stations.csv");
 const tides = {};
