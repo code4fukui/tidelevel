@@ -1,6 +1,6 @@
 # tidelevel
 
-https://code4fukui.github.io/tidelevel/
+- [気象庁 潮位データ 2024-01-01/02 （日本海側5府県）](https://code4fukui.github.io/tidelevel/)
 
 ## auto update
 

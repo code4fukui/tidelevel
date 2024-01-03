@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>気象庁 潮位データ 2024-01-01（日本全体188箇所）</title>
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image"  content="https://code4fukui.github.io/tidelevel/ss.jpg">
+<meta name="twitter:image" content="https://code4fukui.github.io/tidelevel/ss.jpg">
+</head><body>
+<h1>気象庁 潮位データ 2024-01-01（日本全体188箇所）</h1>
+<div class=chart id=divlinechart></div>
+<div id=divlinecharts></div>
+<hr>
+DATA: <a href=https://www.jma.go.jp/bosai/tidelevel/>気象庁｜潮位観測情報</a>, <a href=https://www.data.jma.go.jp/multi/quake/index.html?lang=jp>気象庁 | 地震情報</a><br>
+APP: <a href=https://github.com/code4fukui/tidelevel/>src on GitHub</a><br>
+
+<script type="module">
+import ApexCharts from "https://code4fukui.github.io/apexcharts.js/ApexCharts.js";
+import { Station } from "./Station.js";
+import { CSV } from "https://js.sabae.cc/CSV.js";
+import { DateTime } from "https://js.sabae.cc/DateTime.js";
+
+const eqs = [ // over 5+
+  { datetime: "2024-01-01T16:10+09:00", text: "石川県能登地方	M5.7	震度5強" },
+  { datetime: "2024-01-01T16:23+09:00", text: "石川県能登地方	6.1	震度5強" },
+  { datetime: "2024-01-01T16:24+09:00", text: "石川県能登地方	7.6	震度7" },
+  { datetime: "2024-01-01T17:00+09:00", text: "石川県能登地方	5.7	震度5強" },
+];
+const alerts = [
+  { datetime: "2024-01-01T20:30+09:00", text: "大津波警報→津波警報" },
+  { datetime: "2024-01-02T01:15+09:00", text: "津波警報→津波注意報" },
+  { datetime: "2024-01-02T10:00+09:00", text: "津波注意報 解除" },
+];
+
+const annotations = { xaxis: [] };
+
+for (const eq of [...eqs, ...alerts]) {
+  annotations.xaxis.push({
+    x: new DateTime(eq.datetime).getTime(),
+    borderColor: "#775DD0",
+    label: {
+      style: { color: "#222" },
+      text: eq.text,
+    }
+  });
+}
+
+const showLineChart = (divlinechart, series, height = 350) => {
+  const options = {
+    series,
+    annotations,
+    chart: {
+      height,
+      type: "line",
+      toolbar: {
+        show: true
+      },
+      animations: {
+        enabled: false,
+      },
+    },
+    //colors: ['#77B6EA', '#545454'],
+    /*
+    dataLabels: {
+      enabled: true,
+    },
+    */
+    stroke: {
+      width: 2,
+      curve: "straight",
+    },
+    /*
+    title: {
+      text: title || "",
+      align: "center",
+    },
+    */
+    /*
+    grid: {
+      borderColor: '#e7e7e7',
+      row: {
+        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+        opacity: 0.5
+      },
+    },
+    */
+    /*
+    markers: {
+      size: 1
+    },
+    */
+    /*
+    xaxis: {
+      categories: months.map(i => Math.floor(i / 100) + "/" + i % 100),
+      title: {
+        text: 'Month'
+      }
+    },
+    */
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        datetimeUTC: false,
+        datetimeFormatter: {
+          year: 'yyyy',
+          month: 'yyyy/M',
+          day: 'M/d',
+          hour: 'HH:mm',
+        }
+      }
+    },
+    /*
+    yaxis: {
+      title: {
+        text: 'Temperature'
+      },
+      min: 5,
+      max: 40
+    },
+    */
+    legend: {
+      position: "top",
+      horizontalAlign: "center",
+      //floating: true,
+      //offsetY: -25,
+      //offsetX: -5
+    },
+    tooltip: {
+      x: {
+        formatter: val => {
+          return new DateTime(val).toString();
+        },
+      },
+    },
+    /*
+    tooltip: {
+      y: {
+        formatter: (v) => {
+          return Num.addComma(v) + "人";
+        },
+      }
+    },
+    */
+  };
+
+  const chart = new ApexCharts(divlinechart, options);
+  chart.render();
+};
+
+//const twodays = new DateTime().getTime() > new DateTime("2024-01-02T00:00:00+09:00").getTime();
+const days = ["20240101"];
+//const days = ["20240101", "20240102", "20240103"];
+
+//const stations = await CSV.fetchJSON("data/stations.csv");
+const stations = await CSV.fetchJSON("./stations3.csv");
+stations.forEach(i => i.pref = i.addr.split(" ")[0]);
+
+const tides = {};
+for (const day of days) {
+  for (const s of stations) {
+    const st = new Station(s.code, day);
+    const url = st.getURL();
+    try {
+      const tide = await (await fetch(url)).json();
+      tides[url] = tide;
+    } catch (e) {
+    }
+  }
+}
+
+const show = (div, pref = null) => {
+  const series = [];
+  for (const s of stations) {
+    if (pref && s.pref != pref) continue;
+    const data = [];
+    for (const day of days) {
+      const st = new Station(s.code, day);
+      const url = st.getURL();
+      const tide = tides[url];
+      if (!tide) continue;
+      let t = new DateTime(tide.time).getTime();
+      //console.log(t, performance.now(), new Date().getTime())
+      const dt = parseInt(tide.interval) * 1000;
+      const d = tide.tide;
+      for (let i = 0; i < d.length; i++) {
+        data.push([t, d[i]]);
+        t += dt;
+      }
+    }
+    series.push({ name: s.pref + " " + s.name, data });
+  }
+
+  showLineChart(div, series, 700);
+};
+show(divlinechart);
+
+/*
+const prefs = ["石川県", "富山県", "新潟県", "福井県", "京都府"];
+for (const pref of prefs) {
+  const div = document.createElement("div");
+  div.className = "chart";
+  const h2 = document.createElement("h2");
+  h2.textContent = pref;
+  divlinecharts.appendChild(h2);
+  divlinecharts.appendChild(div);
+  show(div, pref);
+}
+
+setTimeout(() => {
+  location.reload();
+}, 10 * 60 * 1000);
+*/
+</script>
+
+<style>
+body {
+  background-color: #222255;
+  font-family: sans-serif;
+  color: white;
+}
+h1 {
+  color: white;
+}
+.chart {
+  background-color: #f8f8f8;
+  color: #222;
+  margin-bottom: .6em;
+}
+a {
+  color: white !important;
+}
+</style>
