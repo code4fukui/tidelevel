@@ -1,5 +1,7 @@
 import { Day } from "https://js.sabae.cc/DateTime.js";
 
+const base = "https://code4fukui.github.io/tidelevel/";
+
 export class Station {
   constructor(id, dt) {
     this.id = id;
@@ -15,6 +17,6 @@ export class Station {
     return "data/" + this.dt.substring(0, 6) + "/" + this.id + "/";  
   }
   getURL() {
-    return this.getPath() + this.getName();
+    return base + this.getPath() + this.getName();
   }
 };
