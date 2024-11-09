@@ -1,9 +1,1 @@
-<HTML><HEAD>
-<TITLE>Internal Server Error</TITLE>
-</HEAD><BODY>
-<H1>Internal Server Error - Read</H1>
-The server encountered an internal error or misconfiguration and was unable to
-complete your request.<P>
-Reference&#32;&#35;3&#46;a643717&#46;1731191257&#46;e8584bab
-<P>https&#58;&#47;&#47;errors&#46;edgesuite&#46;net&#47;3&#46;a643717&#46;1731191257&#46;e8584bab</P>
-</BODY></HTML>
+{"time":"2024-11-10T00:00:00+09:00","station_code":"188181","interval":15,"tide":[],"departure":[]}
