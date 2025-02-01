@@ -1,1 +1,1 @@
-{"time":"2025-02-02T00:00:00+09:00","station_code":"166605","interval":600,"tide":[75],"departure":[4]}
+{"time":"2025-02-02T00:00:00+09:00","station_code":"166605","interval":600,"tide":[75,75,null,69,64,61],"departure":[4,3,null,-3,-7,-9]}
